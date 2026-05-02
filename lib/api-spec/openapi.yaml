@@ -3,20 +3,36 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: RailATC - AI-Powered Train Traffic Control System API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: trains
+    description: Train management
+  - name: sections
+    description: Track section management
+  - name: schedule
+    description: Train scheduling
+  - name: conflicts
+    description: Conflict detection
+  - name: kpis
+    description: KPI dashboard metrics
+  - name: alerts
+    description: Active alerts and incidents
+  - name: audit
+    description: Audit trail
+  - name: simulation
+    description: What-if simulation
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +40,319 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /trains:
+    get:
+      operationId: listTrains
+      tags: [trains]
+      summary: List all trains
+      responses:
+        "200":
+          description: List of trains
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Train"
+    post:
+      operationId: createTrain
+      tags: [trains]
+      summary: Create a new train
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTrainBody"
+      responses:
+        "201":
+          description: Train created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Train"
+
+  /trains/{id}:
+    get:
+      operationId: getTrain
+      tags: [trains]
+      summary: Get a train by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Train details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Train"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateTrain
+      tags: [trains]
+      summary: Update a train
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTrainBody"
+      responses:
+        "200":
+          description: Train updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Train"
+
+  /sections:
+    get:
+      operationId: listSections
+      tags: [sections]
+      summary: List all track sections
+      responses:
+        "200":
+          description: List of sections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Section"
+
+  /schedule:
+    get:
+      operationId: listSchedule
+      tags: [schedule]
+      summary: Get current schedule entries
+      responses:
+        "200":
+          description: Schedule entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScheduleEntry"
+    post:
+      operationId: createScheduleEntry
+      tags: [schedule]
+      summary: Create a schedule entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateScheduleEntryBody"
+      responses:
+        "201":
+          description: Schedule entry created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduleEntry"
+
+  /schedule/{id}/override:
+    post:
+      operationId: overrideScheduleEntry
+      tags: [schedule]
+      summary: Controller override on a schedule entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OverrideScheduleBody"
+      responses:
+        "200":
+          description: Override applied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduleEntry"
+
+  /schedule/optimize:
+    post:
+      operationId: optimizeSchedule
+      tags: [schedule]
+      summary: Trigger AI schedule optimization
+      responses:
+        "200":
+          description: Optimization result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimizationResult"
+
+  /conflicts:
+    get:
+      operationId: listConflicts
+      tags: [conflicts]
+      summary: List detected conflicts
+      responses:
+        "200":
+          description: List of conflicts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Conflict"
+
+  /conflicts/{id}/resolve:
+    post:
+      operationId: resolveConflict
+      tags: [conflicts]
+      summary: Resolve a conflict
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResolveConflictBody"
+      responses:
+        "200":
+          description: Conflict resolved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conflict"
+
+  /kpis:
+    get:
+      operationId: getKpis
+      tags: [kpis]
+      summary: Get KPI dashboard metrics
+      responses:
+        "200":
+          description: KPI metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KpiSummary"
+
+  /kpis/history:
+    get:
+      operationId: getKpiHistory
+      tags: [kpis]
+      summary: Get KPI trend history (last 24 hours)
+      responses:
+        "200":
+          description: KPI history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KpiSnapshot"
+
+  /alerts:
+    get:
+      operationId: listAlerts
+      tags: [alerts]
+      summary: List active alerts
+      responses:
+        "200":
+          description: Active alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Alert"
+
+  /alerts/{id}/acknowledge:
+    post:
+      operationId: acknowledgeAlert
+      tags: [alerts]
+      summary: Acknowledge an alert
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Alert acknowledged
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+
+  /audit:
+    get:
+      operationId: listAuditLog
+      tags: [audit]
+      summary: List audit log entries
+      responses:
+        "200":
+          description: Audit log
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuditEntry"
+
+  /simulation/scenarios:
+    get:
+      operationId: listScenarios
+      tags: [simulation]
+      summary: List saved simulation scenarios
+      responses:
+        "200":
+          description: Scenarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SimulationScenario"
+
+  /simulation/run:
+    post:
+      operationId: runSimulation
+      tags: [simulation]
+      summary: Run a what-if simulation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RunSimulationBody"
+      responses:
+        "200":
+          description: Simulation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimulationResult"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +360,384 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    Train:
+      type: object
+      properties:
+        id:
+          type: integer
+        trainNumber:
+          type: string
+        type:
+          type: string
+          enum: [express, passenger, freight, suburban, maintenance]
+        priority:
+          type: integer
+          description: 1=highest
+        currentSectionId:
+          type: integer
+          nullable: true
+        status:
+          type: string
+          enum: [on_time, delayed, halted, rerouted, cancelled]
+        delayMinutes:
+          type: integer
+        origin:
+          type: string
+        destination:
+          type: string
+        speedKmh:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, trainNumber, type, priority, status, delayMinutes, origin, destination, speedKmh, createdAt, updatedAt]
+
+    CreateTrainBody:
+      type: object
+      properties:
+        trainNumber:
+          type: string
+        type:
+          type: string
+          enum: [express, passenger, freight, suburban, maintenance]
+        priority:
+          type: integer
+        origin:
+          type: string
+        destination:
+          type: string
+        speedKmh:
+          type: number
+      required: [trainNumber, type, priority, origin, destination, speedKmh]
+
+    UpdateTrainBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [on_time, delayed, halted, rerouted, cancelled]
+        delayMinutes:
+          type: integer
+        currentSectionId:
+          type: integer
+          nullable: true
+        speedKmh:
+          type: number
+
+    Section:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        fromStation:
+          type: string
+        toStation:
+          type: string
+        lineCapacity:
+          type: integer
+          description: Max trains simultaneously
+        currentTrainCount:
+          type: integer
+        lengthKm:
+          type: number
+        gradient:
+          type: string
+          enum: [flat, mild, steep]
+        status:
+          type: string
+          enum: [clear, occupied, blocked, maintenance]
+      required: [id, name, fromStation, toStation, lineCapacity, currentTrainCount, lengthKm, gradient, status]
+
+    ScheduleEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        trainId:
+          type: integer
+        trainNumber:
+          type: string
+        sectionId:
+          type: integer
+        sectionName:
+          type: string
+        plannedArrival:
+          type: string
+          format: date-time
+        plannedDeparture:
+          type: string
+          format: date-time
+        actualArrival:
+          type: string
+          format: date-time
+          nullable: true
+        actualDeparture:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum: [scheduled, in_progress, completed, overridden, cancelled]
+        aiRecommendation:
+          type: string
+          nullable: true
+        overrideReason:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, trainId, trainNumber, sectionId, sectionName, plannedArrival, plannedDeparture, status, createdAt]
+
+    CreateScheduleEntryBody:
+      type: object
+      properties:
+        trainId:
+          type: integer
+        sectionId:
+          type: integer
+        plannedArrival:
+          type: string
+          format: date-time
+        plannedDeparture:
+          type: string
+          format: date-time
+      required: [trainId, sectionId, plannedArrival, plannedDeparture]
+
+    OverrideScheduleBody:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [hold, proceed, reroute]
+        reason:
+          type: string
+        newDepartureTime:
+          type: string
+          format: date-time
+          nullable: true
+      required: [action, reason]
+
+    OptimizationResult:
+      type: object
+      properties:
+        conflictsResolved:
+          type: integer
+        schedulesUpdated:
+          type: integer
+        expectedThroughputGainPct:
+          type: number
+        expectedDelayReductionMin:
+          type: number
+        message:
+          type: string
+      required: [conflictsResolved, schedulesUpdated, expectedThroughputGainPct, expectedDelayReductionMin, message]
+
+    Conflict:
+      type: object
+      properties:
+        id:
+          type: integer
+        sectionId:
+          type: integer
+        sectionName:
+          type: string
+        trainAId:
+          type: integer
+        trainANumber:
+          type: string
+        trainBId:
+          type: integer
+          nullable: true
+        trainBNumber:
+          type: string
+          nullable: true
+        type:
+          type: string
+          enum: [capacity_breach, crossing_conflict, precedence_violation, schedule_overlap]
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        aiSuggestion:
+          type: string
+        status:
+          type: string
+          enum: [active, resolved, acknowledged]
+        detectedAt:
+          type: string
+          format: date-time
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required: [id, sectionId, sectionName, trainAId, trainANumber, type, severity, aiSuggestion, status, detectedAt]
+
+    ResolveConflictBody:
+      type: object
+      properties:
+        resolution:
+          type: string
+        resolvedBy:
+          type: string
+      required: [resolution, resolvedBy]
+
+    KpiSummary:
+      type: object
+      properties:
+        punctualityPct:
+          type: number
+        avgDelayMinutes:
+          type: number
+        throughputTrainsPerHour:
+          type: number
+        sectionUtilizationPct:
+          type: number
+        activeConflicts:
+          type: integer
+        trainsOnTime:
+          type: integer
+        trainsDelayed:
+          type: integer
+        trainsHalted:
+          type: integer
+        totalActiveTrains:
+          type: integer
+      required: [punctualityPct, avgDelayMinutes, throughputTrainsPerHour, sectionUtilizationPct, activeConflicts, trainsOnTime, trainsDelayed, trainsHalted, totalActiveTrains]
+
+    KpiSnapshot:
+      type: object
+      properties:
+        hour:
+          type: string
+        punctualityPct:
+          type: number
+        avgDelayMinutes:
+          type: number
+        throughputTrainsPerHour:
+          type: number
+        sectionUtilizationPct:
+          type: number
+      required: [hour, punctualityPct, avgDelayMinutes, throughputTrainsPerHour, sectionUtilizationPct]
+
+    Alert:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [breakdown, weather, signal_fault, track_obstruction, capacity_warning, delay_cascade]
+        severity:
+          type: string
+          enum: [info, warning, critical]
+        title:
+          type: string
+        message:
+          type: string
+        sectionId:
+          type: integer
+          nullable: true
+        sectionName:
+          type: string
+          nullable: true
+        trainId:
+          type: integer
+          nullable: true
+        trainNumber:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [active, acknowledged, resolved]
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, type, severity, title, message, status, createdAt]
+
+    AuditEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        action:
+          type: string
+        entityType:
+          type: string
+        entityId:
+          type: integer
+          nullable: true
+        performedBy:
+          type: string
+        details:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, action, entityType, performedBy, details, createdAt]
+
+    SimulationScenario:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        disruptionType:
+          type: string
+          enum: [breakdown, weather_delay, track_block, increased_traffic, signal_failure]
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, name, description, disruptionType, createdAt]
+
+    RunSimulationBody:
+      type: object
+      properties:
+        scenarioId:
+          type: integer
+          nullable: true
+        disruptionType:
+          type: string
+          enum: [breakdown, weather_delay, track_block, increased_traffic, signal_failure]
+        affectedSectionId:
+          type: integer
+          nullable: true
+        durationMinutes:
+          type: integer
+        name:
+          type: string
+      required: [disruptionType, durationMinutes, name]
+
+    SimulationResult:
+      type: object
+      properties:
+        scenarioName:
+          type: string
+        disruptionType:
+          type: string
+        impactedTrains:
+          type: integer
+        delayMinutesAdded:
+          type: number
+        throughputImpactPct:
+          type: number
+        recommendedActions:
+          type: array
+          items:
+            type: string
+        alternativeRoutes:
+          type: array
+          items:
+            type: string
+        estimatedRecoveryMinutes:
+          type: integer
+      required: [scenarioName, disruptionType, impactedTrains, delayMinutesAdded, throughputImpactPct, recommendedActions, alternativeRoutes, estimatedRecoveryMinutes]
