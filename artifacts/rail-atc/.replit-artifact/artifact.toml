@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "RailATC - AI Train Traffic Control"
+version = "1.0.0"
+id = "artifacts/rail-atc"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19717
+
+[services.development]
+run = "pnpm --filter @workspace/rail-atc run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/rail-atc", "run", "build" ]
+publicDir = "artifacts/rail-atc/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19717"
+BASE_PATH = "/"
