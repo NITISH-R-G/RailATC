@@ -33,7 +33,7 @@ router.post("/conflicts/:id/resolve", async (req, res) => {
       .set({ status: "resolved", resolvedAt: new Date() })
       .where(eq(conflictsTable.id, id))
       .returning();
-    if (!conflict) return res.status(404).json({ error: "Conflict not found" });
+    if (!conflict) { res.status(404).json({ error: "Conflict not found" }); return; }
 
     await db.insert(auditTable).values({
       action: "conflict_resolved",

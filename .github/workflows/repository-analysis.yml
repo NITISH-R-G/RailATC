@@ -1,0 +1,46 @@
+name: Repository Analysis & Documentation
+
+on:
+  push:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 0 * * 0' # Run weekly to ensure nothing gets stale
+  workflow_dispatch: # Allow manual triggers
+
+jobs:
+  analyze-and-document:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Need to write back to the repo
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Need full history for some analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Setup dependencies for scripts
+        run: |
+          mkdir -p .github/scripts
+          cd .github/scripts && npm install || true
+
+      - name: Run Repository Analysis
+        run: node .github/scripts/analyze-repo.js
+
+      - name: Build Knowledge Graph
+        run: node .github/scripts/build-knowledge-graph.js
+
+      - name: Generate Diagrams
+        run: node .github/scripts/generate-diagrams.js
+
+      - name: Auto-update README
+        run: node .github/scripts/generate-readme.js
+
+      - name: Commit and Push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "docs: auto-update repository documentation [skip ci]"
+          file_pattern: "README.md docs/ diagrams/ .github/knowledge-graph.json .github/repo-metadata.json"
