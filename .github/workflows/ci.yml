@@ -42,7 +42,7 @@ jobs:
         run: pnpm run typecheck
 
       - name: Run Build
-        run: PORT=3000 BASE_PATH="/" pnpm run build --if-present
+        run: PORT=3000 BASE_PATH="/" pnpm run build
 
       - name: Run Lint
         run: pnpm run lint --if-present
