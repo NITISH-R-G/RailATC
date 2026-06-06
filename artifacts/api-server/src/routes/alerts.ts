@@ -30,7 +30,7 @@ router.post("/alerts/:id/acknowledge", async (req, res) => {
       .set({ status: "acknowledged" })
       .where(eq(alertsTable.id, id))
       .returning();
-    if (!alert) return res.status(404).json({ error: "Alert not found" });
+    if (!alert) { res.status(404).json({ error: "Alert not found" }); return; }
 
     await db.insert(auditTable).values({
       action: "alert_acknowledged",

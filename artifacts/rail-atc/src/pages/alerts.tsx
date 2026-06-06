@@ -15,7 +15,7 @@ export default function Alerts() {
 
   const handleAcknowledge = (id: number) => {
     ackMutation.mutate(
-      { id, data: { status: "acknowledged" } },
+      { id },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListAlertsQueryKey() });

@@ -1,0 +1,33 @@
+name: AI Documentation Agent
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  ai-review-and-document:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup dependencies for scripts
+        run: |
+          mkdir -p .github/scripts
+          cd .github/scripts && npm install || true
+
+      - name: Run AI Agent
+        run: node .github/scripts/ai-agent.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # Assuming OpenAI for this example
+          PR_NUMBER: ${{ github.event.pull_request.number }}

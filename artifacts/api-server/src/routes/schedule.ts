@@ -53,7 +53,7 @@ router.post("/schedule/:id/override", async (req, res) => {
       updateData.plannedDeparture = new Date(body.newDepartureTime);
     }
     const [entry] = await db.update(scheduleTable).set(updateData).where(eq(scheduleTable.id, id)).returning();
-    if (!entry) return res.status(404).json({ error: "Schedule entry not found" });
+    if (!entry) { res.status(404).json({ error: "Schedule entry not found" }); return; }
 
     await db.insert(auditTable).values({
       action: "schedule_override",

@@ -19,7 +19,7 @@ const queryClient = new QueryClient();
 
 function Sidebar() {
   const [location] = useLocation();
-  const { data: health } = useHealthCheck({ query: { refetchInterval: 10000 } });
+  const { data: health } = useHealthCheck({ query: { queryKey: ["healthCheck"], refetchInterval: 10000 } });
 
   const navItems = [
     { href: "/", label: "Dashboard", icon: Home },

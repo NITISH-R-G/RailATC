@@ -30,7 +30,7 @@ router.get("/trains/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const [train] = await db.select().from(trainsTable).where(eq(trainsTable.id, id));
-    if (!train) return res.status(404).json({ error: "Train not found" });
+    if (!train) { res.status(404).json({ error: "Train not found" }); return; }
     res.json(train);
   } catch (err) {
     req.log.error(err);
@@ -46,7 +46,7 @@ router.patch("/trains/:id", async (req, res) => {
       .set({ ...body, updatedAt: new Date() })
       .where(eq(trainsTable.id, id))
       .returning();
-    if (!train) return res.status(404).json({ error: "Train not found" });
+    if (!train) { res.status(404).json({ error: "Train not found" }); return; }
     res.json(train);
   } catch (err) {
     req.log.error(err);
